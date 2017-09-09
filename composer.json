@@ -1,0 +1,21 @@
+{
+    "name": "bajdzis/cms",
+    "authors": [
+        {
+            "name": "Bajdzis",
+            "email": "rafal612b@wp.pl"
+        }
+    ],
+    "require": {},
+    "require-dev": {
+        "phpunit/phpunit": "^6.2"
+    },
+    "autoload": {
+        "psr-4": {"Bajdzis\\": ""}
+    },
+    "scripts": {
+        "test": [
+            "phpunit --bootstrap vendor/autoload.php Tests"
+        ]
+    }
+}
