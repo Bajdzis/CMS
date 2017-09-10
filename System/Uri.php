@@ -5,25 +5,25 @@ namespace Bajdzis\System;
 /**
  * Klasa odwzorująca linki w systemie CMS.
  */
-class Url
+class Uri
 {
-    private $url;
-    private $protocol;
+    private $scheme;
     private $domain;
     private $subDomain;
     private $params;
 
-    function __construct(string $url = null)
+    function __construct(string $uri = null)
     {
-        if ($url === null) {
+        if ($uri === null) {
 
-            return $this;
+            return;
         }
-        $matches = $this->parseUrl($url);
-        $this->setProtocol($matches['protocol']);
-        $this->setDomain($matches['domain']);
-        $this->setSubDomain($matches['subDomain']);
-        $this->setParamsFromString($matches['params']);
+        $matches = $this->parseUri($uri);
+        $this->setScheme($matches['scheme']);
+        $this->setHost($matches['host']);
+        if(isset($matches['path'])){
+            $this->setParamsFromString($matches['path']);
+        }
     }
 
     public function setDomain(string $domain)
@@ -46,14 +46,21 @@ class Url
         return strlen($this->subDomain) === 0 ? null : $this->subDomain;
     }
 
-    public function setProtocol(string $protocol)
+    public function setHost($host)
     {
-        $this->protocol = $protocol;
+        $result = preg_match("/(((?<subDomain>[^\/]*)\.)?)(?<domain>[^\.\/]*\.[^\.\/]*)/", $host, $matches);
+        $this->setDomain($matches['domain']);
+        $this->setSubDomain($matches['subDomain']);
     }
 
-    public function getProtocol()
+    public function setScheme(string $scheme)
     {
-        return $this->protocol;
+        $this->scheme = $scheme;
+    }
+
+    public function getScheme()
+    {
+        return $this->scheme;
     }
 
     public function setParams(array $params)
@@ -69,9 +76,9 @@ class Url
         return $this->params;
     }
 
-    public function getUrl() : string
+    public function getUri() : string
     {
-        return $this->getProtocol().':'.$this->getLink();
+        return $this->getScheme().':'.$this->getLink();
     }
 
     public function getLink() : string
@@ -101,14 +108,14 @@ class Url
         $this->setParams($params);
     }
 
-    protected function parseUrl(string $url)
+    protected function parseUri(string $uri)
     {
-        $result = preg_match("/(?<protocol>[a-z]*):\/\/(((?<subDomain>[^\/]*)\.)?)(?<domain>[^\:\.\/]*\.[^\:\.\/]*)((\:(?<port>[0-9]*))?)(\/{0,1}(?<params>.*))/", $url, $matches);
-        if($result === 0){
-            throw new \InvalidArgumentException("parseUrl only accepts correct url. Input was : ".$url);
+        $result = parse_url($uri);
+        if ($result === false) {
+            throw new \InvalidArgumentException("parseUri only accepts correct url. Input was : ".$uri);
         }
 
-        return $matches;
+        return $result;
     }
 
     protected function getJoinParams() : string
@@ -121,15 +128,13 @@ class Url
         return implode('/', $params);
     }
 
-    public static function getCurrentUrl()
+    public static function getCurrentUri()
     {
-        $url = new Url();
-        $result = preg_match("/(((?<subDomain>[^\/]*)\.)?)(?<domain>[^\.\/]*\.[^\.\/]*)/", $_SERVER['HTTP_HOST'], $matches);
-        $url->setProtocol($_SERVER['REQUEST_SCHEME']);
-        $url->setParamsFromString($_SERVER['REQUEST_URI']);
-        $url->setDomain($matches['domain']);
-        $url->setSubDomain($matches['subDomain']);
+        $uri = new Uri();
+        $uri->setScheme($_SERVER['REQUEST_SCHEME']);
+        $uri->setParamsFromString($_SERVER['REQUEST_URI']);
+        $uri->setHost($_SERVER['HTTP_HOST']);
 
-        return $url;
+        return $uri;
     }
 }
