@@ -16,6 +16,9 @@
     "scripts": {
         "test": [
             "phpunit --bootstrap vendor/autoload.php Tests"
+        ],
+        "test-coverage": [
+            "phpunit --coverage-html coverage --whitelist System --bootstrap vendor/autoload.php Tests"
         ]
     }
 }

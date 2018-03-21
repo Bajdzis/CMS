@@ -26,6 +26,16 @@ class Uri
         }
     }
 
+    public function compare(Uri $uri): array
+    {
+        return [
+            'domain' => $this->compareDomain($uri),
+            'subDomain' => $this->compareSubDomain($uri),
+            'scheme' => $this->compareScheme($uri),
+            'params' => $this->compareParams($uri)
+        ];
+    }
+
     public function setDomain(string $domain)
     {
         $this->domain = $domain;
@@ -36,6 +46,11 @@ class Uri
         return $this->domain;
     }
 
+    public function compareDomain(Uri $uri): bool
+    {
+        return $this->getDomain() === $uri->getDomain();
+    }
+
     public function setSubDomain(string $subDomain)
     {
         $this->subDomain = $subDomain;
@@ -44,6 +59,11 @@ class Uri
     public function getSubDomain()
     {
         return strlen($this->subDomain) === 0 ? null : $this->subDomain;
+    }
+
+    public function compareSubDomain(Uri $uri): bool
+    {
+        return $this->getSubDomain() === $uri->getSubDomain();
     }
 
     public function setHost($host)
@@ -63,6 +83,11 @@ class Uri
         return $this->scheme;
     }
 
+    public function compareScheme(Uri $uri): bool
+    {
+        return $this->getScheme() === $uri->getScheme();
+    }
+
     public function setParams(array $params)
     {
         foreach ($params as $key => $param) {
@@ -71,9 +96,14 @@ class Uri
         $this->params = $params;
     }
 
-    public function getParams()
+    public function getParams(): array
     {
-        return $this->params;
+        return $this->params ?? [];
+    }
+
+    public function compareParams(Uri $uri): bool
+    {
+        return $this->getJoinParams() === $uri->getJoinParams();
     }
 
     public function getUri() : string
@@ -96,7 +126,7 @@ class Uri
         return "//$subDomain$domain/$params/";
     }
 
-    protected function setParamsFromString(string $paramsString)
+    public function setParamsFromString(string $paramsString)
     {
         $params = explode('/', $paramsString);
         if(end($params) === '' ){

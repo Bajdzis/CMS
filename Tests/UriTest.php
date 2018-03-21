@@ -82,11 +82,11 @@ final class UriTest extends TestCase
     public function testCreateEmptyUri()
     {
         $uri = new Uri();
-        
+
         $this->assertSame($uri->getScheme(), null);
         $this->assertSame($uri->getDomain(), null);
         $this->assertSame($uri->getSubDomain(), null);
-        $this->assertSame($uri->getParams(), null);
+        $this->assertSame($uri->getParams(), []);
     }
 
     public function testCreateCurrentUri()
