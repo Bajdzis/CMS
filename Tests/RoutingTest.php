@@ -45,13 +45,13 @@ final class RoutingTest extends TestCase
     {
         RoutingTest::$text = "";
         $uri = $this->prepareUrl();
-        $routing = new Routing();
+        $routing = new Routing($uri);
 
         $routing->addPath('/', 'RoutingTest::addBlogStringToTextField');
         $routing->addPath('/', 'RoutingTest::addHomepageStringToTextField');
 
         $this->assertSame(RoutingTest::$text, '');
-        $routing->execute($uri);
+        $routing->execute();
         $this->assertSame(RoutingTest::$text, 'BlogHomepage');
     }
 
@@ -59,7 +59,7 @@ final class RoutingTest extends TestCase
     {
         RoutingTest::$text = "";
         $uri = $this->prepareUrl();
-        $routing = new Routing();
+        $routing = new Routing($uri);
 
         $routing->addPath('/', 'RoutingTest::addBlogStringToTextField');
         $routing->addPath('/', 'RoutingTest::returnFalse');
@@ -67,7 +67,7 @@ final class RoutingTest extends TestCase
         $routing->addPath('/', 'RoutingTest::returnTrue');
         $routing->addPath('/', 'RoutingTest::addHomepageStringToTextField');
 
-        $routing->execute($uri);
+        $routing->execute();
         $this->assertSame(RoutingTest::$text, 'BlogBlog');
     }
 
@@ -75,14 +75,14 @@ final class RoutingTest extends TestCase
     {
         RoutingTest::$text = "";
         $uri = $this->prepareUrl(['blog', 'some-title']);
-        $routing = new Routing();
+        $routing = new Routing($uri);
 
         $routing->addPath('/', 'RoutingTest::addJoinParamsToTextField');
         $routing->addPath('/blog/', 'RoutingTest::addJoinParamsToTextField');
         $routing->addPath('/not-execute-this/', 'RoutingTest::addJoinParamsToTextField');
         $routing->addPath('/not/execute/this/', 'RoutingTest::addJoinParamsToTextField');
 
-        $routing->execute($uri);
+        $routing->execute();
         $this->assertSame(RoutingTest::$text, 'blogsome-titlesome-title');
     }
 

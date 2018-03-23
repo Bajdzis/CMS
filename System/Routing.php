@@ -8,15 +8,16 @@ use Bajdzis\System\RoutingRule;
 class Routing
 {
     private $pathsList = [];
+    private $currentUri;
 
-    function __construct()
+    function __construct(Uri $currentUri)
     {
-        
+        $this->currentUri = $currentUri;
     }
 
     public function addPath($path, $function)
     {
-        $uri = Uri::getCurrentUri();
+        $uri = clone $this->currentUri;
         $uri->setParamsFromString($path);
 
         return $this->addUri($uri, $function);
@@ -30,10 +31,10 @@ class Routing
         return $role;
     }
 
-    public function execute(Uri $executeUri)
+    public function execute()
     {
         foreach ($this->pathsList as $role) {
-            $result = $role->execute($executeUri);
+            $result = $role->execute($this->currentUri);
             if($result === true){
                 break;
             }
