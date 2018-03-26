@@ -2,14 +2,15 @@
 
 namespace Bajdzis\Action;
 
-class DefineConst
+use \Bajdzis\System\RoutingAction;
+
+class DefineConst extends RoutingAction
 {
 
-    public static function execute($relativeParam, $url)
+    public function execute()
     {
-        define ('IS_LOCALHOST', $_SERVER['HTTP_HOST'] == 'localhost');
         define ('DEBUG_MODE', false);
-        return false;
+        return RoutingAction::CONTINUE_WORK;
     }
 
 }

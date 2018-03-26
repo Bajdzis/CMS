@@ -2,17 +2,18 @@
 
 namespace Bajdzis\System;
 
-use Bajdzis\System\Uri;
+use \Bajdzis\System\Uri;
+use \Bajdzis\System\RoutingAction;
 
 class RoutingRule
 {
     private $path;
-    private $function;
+    private $className;
 
-    function __construct(Uri $uri, $function)
+    function __construct(Uri $uri, $className)
     {
         $this->uri = $uri;
-        $this->function = $function;
+        $this->className = $className;
     }
 
     public function execute(Uri $executeUri)
@@ -38,7 +39,13 @@ class RoutingRule
 
         $relativeParams = array_slice($executeParams, count($roleParams) );
 
-        $functionName = $this->function;
-        return $functionName($relativeParams, $executeUri);
+        $className = $this->className;
+        $classInstance = new $className();
+        if(($classInstance instanceof RoutingAction) === false){
+            throw new \Exception("Error '$className' is not valid RoutingAction instance", 1);
+        }
+        $classInstance->setCurrentUrl($executeUri);
+        $classInstance->setRelativeParams($relativeParams);
+        return $classInstance->execute();
     }
 }

@@ -2,7 +2,9 @@
 
 namespace Bajdzis\Action;
 
-class ShowErrorPage
+use \Bajdzis\System\RoutingAction;
+
+class ShowErrorPage extends RoutingAction
 {
     private static $descriptions = array(
 		100=>'Continue',
@@ -48,13 +50,13 @@ class ShowErrorPage
 		505=>'HTTP Version Not Supported'
 	);
 
-    public static function execute($relativeParam, $url)
+    public function execute()
     {
         $errorCode = http_response_code();
         $description = self::$descriptions[$errorCode];
         echo "<h1>$errorCode</h1>";
         echo "<p>$description</p>";
-        return true;
+        return RoutingAction::DONE_WORK;
     }
 
 }
