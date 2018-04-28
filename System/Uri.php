@@ -68,6 +68,10 @@ class Uri
 
     public function setHost($host)
     {
+        if($host === 'localhost'){
+            $this->setDomain('localhost');
+            return;
+        }
         $result = preg_match("/(((?<subDomain>[^\/]*)\.)?)(?<domain>[^\.\/]*\.[^\.\/]*)/", $host, $matches);
         $this->setDomain($matches['domain']);
         $this->setSubDomain($matches['subDomain']);

@@ -4,6 +4,7 @@ namespace Bajdzis\System;
 
 use Bajdzis\System\Uri;
 use Bajdzis\System\RoutingRule;
+use Bajdzis\System\RoutingAction;
 
 class Routing
 {
@@ -35,7 +36,7 @@ class Routing
     {
         foreach ($this->pathsList as $role) {
             $result = $role->execute($this->currentUri);
-            if($result === true){
+            if($result === RoutingAction::DONE_WORK){
                 break;
             }
         }

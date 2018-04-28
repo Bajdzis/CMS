@@ -3,43 +3,68 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 use Bajdzis\System\Routing;
+use Bajdzis\System\RoutingAction;
 use Bajdzis\System\Uri;
 
 $_SERVER['REQUEST_SCHEME'] = 'http';
 $_SERVER['HTTP_HOST'] = 'example.com';
 $_SERVER['REQUEST_URI'] = '/blog/some-title/';
 
+/**
+ * HELPER CLASSES
+ * 
+ */
+
+class addBlogStringToTextField extends RoutingAction
+{
+    public function execute()
+    {
+        RoutingTest::$text .= "Blog";
+        return RoutingAction::CONTINUE_WORK;
+    }
+}
+
+class addHomepageStringToTextField extends RoutingAction
+{
+    public function execute()
+    {
+        RoutingTest::$text .= "Homepage";
+        return RoutingAction::CONTINUE_WORK;
+    }
+}
+
+class addJoinParamsToTextField extends RoutingAction
+{
+    public function execute()
+    {
+        RoutingTest::$text .= implode('', $this->relativeParams);
+        return RoutingAction::CONTINUE_WORK;
+    }
+}
+
+class returnFalse extends RoutingAction
+{
+    public function execute()
+    {
+        return RoutingAction::CONTINUE_WORK;
+    }
+}
+
+class returnTrue extends RoutingAction
+{
+    public function execute()
+    {
+        return RoutingAction::DONE_WORK;
+    }
+}
+
+/**
+ * TEST CLASS
+ * 
+ */
 final class RoutingTest extends TestCase
 {
     static $text;
-
-    public static function addBlogStringToTextField()
-    {
-        RoutingTest::$text .= "Blog";
-        return false;
-    }
-
-    public static function addHomepageStringToTextField()
-    {
-        RoutingTest::$text .= "Homepage";
-        return false;
-    }
-
-    public static function addJoinParamsToTextField($params)
-    {
-        RoutingTest::$text .= implode('', $params);
-        return false;
-    }
-
-    public static function returnFalse()
-    {
-        return false;
-    }
-
-    public static function returnTrue()
-    {
-        return true;
-    }
 
     public function testRoutingOrder()
     {
@@ -47,8 +72,8 @@ final class RoutingTest extends TestCase
         $uri = $this->prepareUrl();
         $routing = new Routing($uri);
 
-        $routing->addPath('/', 'RoutingTest::addBlogStringToTextField');
-        $routing->addPath('/', 'RoutingTest::addHomepageStringToTextField');
+        $routing->addPath('/', '\addBlogStringToTextField');
+        $routing->addPath('/', '\addHomepageStringToTextField');
 
         $this->assertSame(RoutingTest::$text, '');
         $routing->execute();
@@ -61,11 +86,11 @@ final class RoutingTest extends TestCase
         $uri = $this->prepareUrl();
         $routing = new Routing($uri);
 
-        $routing->addPath('/', 'RoutingTest::addBlogStringToTextField');
-        $routing->addPath('/', 'RoutingTest::returnFalse');
-        $routing->addPath('/', 'RoutingTest::addBlogStringToTextField');
-        $routing->addPath('/', 'RoutingTest::returnTrue');
-        $routing->addPath('/', 'RoutingTest::addHomepageStringToTextField');
+        $routing->addPath('/', '\addBlogStringToTextField');
+        $routing->addPath('/', '\returnFalse');
+        $routing->addPath('/', '\addBlogStringToTextField');
+        $routing->addPath('/', '\returnTrue');
+        $routing->addPath('/', '\addHomepageStringToTextField');
 
         $routing->execute();
         $this->assertSame(RoutingTest::$text, 'BlogBlog');
@@ -77,10 +102,10 @@ final class RoutingTest extends TestCase
         $uri = $this->prepareUrl(['blog', 'some-title']);
         $routing = new Routing($uri);
 
-        $routing->addPath('/', 'RoutingTest::addJoinParamsToTextField');
-        $routing->addPath('/blog/', 'RoutingTest::addJoinParamsToTextField');
-        $routing->addPath('/not-execute-this/', 'RoutingTest::addJoinParamsToTextField');
-        $routing->addPath('/not/execute/this/', 'RoutingTest::addJoinParamsToTextField');
+        $routing->addPath('/', '\addJoinParamsToTextField');
+        $routing->addPath('/blog/', '\addJoinParamsToTextField');
+        $routing->addPath('/not-execute-this/', '\addJoinParamsToTextField');
+        $routing->addPath('/not/execute/this/', '\addJoinParamsToTextField');
 
         $routing->execute();
         $this->assertSame(RoutingTest::$text, 'blogsome-titlesome-title');

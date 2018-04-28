@@ -89,6 +89,16 @@ final class UriTest extends TestCase
         $this->assertSame($uri->getParams(), []);
     }
 
+    public function testCreateLocalhostUri()
+    {
+        $uri = new Uri('http://localhost');
+
+        $this->assertSame($uri->getScheme(), 'http');
+        $this->assertSame($uri->getDomain(), 'localhost');
+        $this->assertSame($uri->getSubDomain(), null);
+        $this->assertSame($uri->getParams(), []);
+    }
+
     public function testCreateCurrentUri()
     {
         $_SERVER['REQUEST_SCHEME'] = 'http';
